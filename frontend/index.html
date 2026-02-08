@@ -1,76 +1,433 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Prediksi Macet AI</title>
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>AI Traffic Predictor</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
     <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
-        label { font-weight: bold; }
-        input { padding: 5px; margin-bottom: 15px; width: 100%; }
-        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #0056b3; }
-        #hasil { margin-top: 20px; color: #28a745; }
+      :root {
+        --primary: #6366f1; /* Indigo yang lebih modern */
+        --primary-dark: #4f46e5;
+        --secondary: #0ea5e9; /* Sky Blue */
+        --bg-gradient-start: #eef2ff;
+        --bg-gradient-end: #e0e7ff;
+        --card-bg: rgba(255, 255, 255, 0.95);
+        --text-main: #1e293b;
+        --text-sub: #64748b;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --error: #ef4444;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(
+          135deg,
+          var(--bg-gradient-start) 0%,
+          var(--bg-gradient-end) 100%
+        );
+        /* Setup layout untuk footer sticky di bawah */
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        color: var(--text-main);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Wrapper untuk menengahkan konten utama */
+      .main-wrapper {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding-bottom: 20px; /* Jarak ke footer */
+      }
+
+      .container {
+        background: var(--card-bg);
+        padding: 2rem;
+        border-radius: 24px;
+        /* Efek kaca (glassmorphism) halus */
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.05),
+          0 10px 15px -3px rgba(0, 0, 0, 0.05),
+          0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+        width: 100%;
+        max-width: 400px; /* Optimal untuk mobile width */
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .icon-header {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 16px;
+        color: white;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+        transform: rotate(-5deg);
+      }
+
+      h1 {
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.5px;
+      }
+
+      p.subtitle {
+        font-size: 0.875rem;
+        color: var(--text-sub);
+        margin-top: 0.25rem;
+        font-weight: 400;
+      }
+
+      .form-group {
+        margin-bottom: 1.25rem;
+      }
+
+      label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-main);
+        margin-left: 4px;
+      }
+
+      .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .input-icon {
+        position: absolute;
+        left: 16px;
+        color: var(--text-sub);
+        font-size: 1rem;
+        z-index: 2;
+        pointer-events: none;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 14px 16px 14px 48px; /* Padding kiri untuk ikon */
+        border: 2px solid #e2e8f0;
+        border-radius: 14px;
+        font-size: 0.95rem;
+        font-family: inherit;
+        font-weight: 500;
+        background-color: #f8fafc;
+        color: var(--text-main);
+        transition: all 0.2s ease;
+        appearance: none; /* Hilangkan style default browser */
+      }
+
+      /* Custom arrow untuk select */
+      select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 1rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--primary);
+        background-color: #fff;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+      }
+
+      /* Tombol Utama */
+      .btn-primary {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(
+          to right,
+          var(--primary),
+          var(--primary-dark)
+        );
+        color: white;
+        border: none;
+        border-radius: 14px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 12px -1px rgba(99, 102, 241, 0.3);
+      }
+
+      .btn-primary:active {
+        transform: scale(0.98);
+      }
+
+      .btn-primary:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* Kartu Hasil */
+      .result-card {
+        margin-top: 1.5rem;
+        padding: 1.25rem;
+        border-radius: 14px;
+        background-color: #f1f5f9;
+        text-align: center;
+        display: none;
+        border: 1px solid #e2e8f0;
+      }
+
+      .result-card.active {
+        display: block;
+        animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .result-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        font-weight: 600;
+        color: var(--text-sub);
+        margin-bottom: 0.25rem;
+      }
+
+      .result-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-main);
+        line-height: 1.2;
+      }
+
+      .status-badge {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      /* Footer Styles */
+      footer {
+        text-align: center;
+        padding-top: 1rem;
+        font-size: 0.75rem;
+        color: var(--text-sub);
+        font-weight: 500;
+        letter-spacing: 0.5px;
+      }
+
+      /* Loading Animation */
+      .loading-spinner {
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Responsive adjustments for small phones */
+      @media (max-width: 380px) {
+        .container {
+          padding: 1.5rem;
+        }
+        h1 {
+          font-size: 1.25rem;
+        }
+        .btn-primary {
+          padding: 14px;
+        }
+      }
     </style>
-</head>
-<body>
-    <h1>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stoplights" viewBox="0 0 16 16">
-            <path d="M8 5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m0 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m1.5 2.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
-            <path d="M4 2a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2h2c-.167.5-.8 1.6-2 2v2h2c-.167.5-.8 1.6-2 2v2h2c-.167.5-.8 1.6-2 2v1a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-1c-1.2-.4-1.833-1.5-2-2h2V8c-1.2-.4-1.833-1.5-2-2h2V4c-1.2-.4-1.833-1.5-2-2zm2-1a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1z"/>
-        </svg>
-        Sistem Prediksi Lalu Lintas
-    </h1>
-    
-    <label>Kecepatan Saat Ini (km/jam):</label><br>
-    <input type="number" id="speed" value="30" placeholder="Contoh: 30"><br>
-    
-    <label>Curah Hujan (mm):</label><br>
-    <input type="number" id="rain" value="0" placeholder="0 = Cerah, >10 = Hujan"><br>
-    
-    <label>Hari Libur? (1=Ya, 0=Tidak):</label><br>
-    <input type="number" id="holiday" value="0" placeholder="1 atau 0"><br>
-    
-    <button onclick="kirimPrediksi()">PREDIKSI SEKARANG</button>
-    
-    <h2 id="hasil">Hasil: -</h2>
+  </head>
+  <body>
+    <main class="main-wrapper">
+      <div class="container">
+        <header>
+          <div class="icon-header">
+            <i class="fas fa-robot"></i>
+          </div>
+          <h1>Prediksi Macet AI</h1>
+          <p class="subtitle">Kelompok 5 - Kecerdasan Buatan</p>
+        </header>
+
+        <div class="form-group">
+          <label for="speed">Kecepatan Saat Ini (km/jam)</label>
+          <div class="input-wrapper">
+            <i class="fas fa-gauge-high input-icon"></i>
+            <input
+              type="number"
+              id="speed"
+              placeholder="Contoh: 40"
+              value="30"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="rain">Curah Hujan (mm)</label>
+          <div class="input-wrapper">
+            <i class="fas fa-cloud-showers-heavy input-icon"></i>
+            <input type="number" id="rain" placeholder="0 = Cerah" value="0" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="holiday">Status Hari</label>
+          <div class="input-wrapper">
+            <i class="fas fa-calendar-check input-icon"></i>
+            <select id="holiday">
+              <option value="0">🏢 Hari Kerja (Biasa)</option>
+              <option value="1">🏖️ Hari Libur / Weekend</option>
+            </select>
+          </div>
+        </div>
+
+        <button onclick="kirimPrediksi()" id="btnPredict" class="btn-primary">
+          <i class="fas fa-wand-magic-sparkles"></i> Prediksi Sekarang
+        </button>
+
+        <div class="result-card" id="resultCard">
+          <div class="result-label">Hasil Prediksi</div>
+          <div class="result-value" id="resultValue">-</div>
+          <div id="statusBadge"></div>
+        </div>
+      </div>
+    </main>
+
+    <footer>&copy; 2026. UNSIA Kelompok 5 Kecerdasan Buatan</footer>
 
     <script>
-        async function kirimPrediksi() {
-            let hasilElem = document.getElementById('hasil');
-            hasilElem.innerText = "Sedang memproses...";
+      async function kirimPrediksi() {
+        const btn = document.getElementById("btnPredict");
+        const resultCard = document.getElementById("resultCard");
+        const resultValue = document.getElementById("resultValue");
+        const statusBadge = document.getElementById("statusBadge");
+        const originalBtnText = btn.innerHTML;
 
-            let data = {
-                speed: document.getElementById('speed').value,
-                rain: document.getElementById('rain').value,
-                holiday: document.getElementById('holiday').value
-            };
+        // Reset & Loading State
+        resultCard.classList.remove("active");
+        btn.disabled = true;
+        btn.innerHTML =
+          '<i class="fas fa-circle-notch loading-spinner"></i> Menganalisis...';
 
-            try {
-                // Pastikan alamat URL lengkap agar bisa diakses dari mana saja
-                let response = await fetch('http://127.0.0.1:5000/predict', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(data)
-                });
+        let data = {
+          speed: document.getElementById("speed").value,
+          rain: document.getElementById("rain").value,
+          holiday: document.getElementById("holiday").value,
+        };
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+        try {
+          // Simulasi delay network (opsional)
+          await new Promise((r) => setTimeout(r, 800));
 
-                let result = await response.json();
-                
-                if (result.error) {
-                    hasilElem.innerText = "Error: " + result.error;
-                    hasilElem.style.color = "red";
-                } else {
-                    hasilElem.innerText = "Prediksi Kecepatan Nanti: " + result.prediksi + " km/jam";
-                    hasilElem.style.color = "#28a745";
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                hasilElem.innerText = "Gagal koneksi ke server Python. Pastikan app.py berjalan!";
-                hasilElem.style.color = "red";
+          // PENTING: Ganti URL ini jika di-deploy ke server lain
+          let response = await fetch("http://127.0.0.1:5000/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+
+          if (!response.ok) throw new Error(`Server Error: ${response.status}`);
+          let result = await response.json();
+
+          resultCard.classList.add("active");
+
+          if (result.error) {
+            resultValue.innerText = "Error";
+            statusBadge.innerHTML = `<span class="status-badge" style="background:#fee2e2; color:var(--error)">${result.error}</span>`;
+          } else {
+            // Tampilkan Hasil
+            const speed = parseFloat(result.prediksi).toFixed(1);
+            resultValue.innerText = speed + " km/jam";
+
+            // Logika visual status
+            let badgeColor, badgeBg, badgeText, badgeIcon;
+            if (speed < 25) {
+              badgeColor = "var(--error)";
+              badgeBg = "#fee2e2";
+              badgeText = "Macet Parah";
+              badgeIcon = "fa-triangle-exclamation";
+            } else if (speed < 45) {
+              badgeColor = "var(--warning)";
+              badgeBg = "#fef3c7";
+              badgeText = "Padat Merayap";
+              badgeIcon = "fa-car-side";
+            } else {
+              badgeColor = "var(--success)";
+              badgeBg = "#d1fae5";
+              badgeText = "Lancar Jaya";
+              badgeIcon = "fa-circle-check";
             }
+
+            statusBadge.innerHTML = `<span class="status-badge" style="background:${badgeBg}; color:${badgeColor}"><i class="fas ${badgeIcon}" style="margin-right:4px"></i> ${badgeText}</span>`;
+          }
+        } catch (error) {
+          resultCard.classList.add("active");
+          resultValue.innerText = "Gagal";
+          statusBadge.innerHTML = `<span class="status-badge" style="background:#fee2e2; color:var(--error)">Koneksi ke Server Gagal</span>`;
+          console.error(error);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = originalBtnText;
         }
+      }
     </script>
-</body>
+  </body>
 </html>
